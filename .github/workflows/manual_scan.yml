@@ -1,0 +1,35 @@
+name: Run Web Scanner
+
+on:
+  workflow_dispatch:  # This adds a "Run Workflow" button to the Actions tab
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Create Config File
+      # This step takes the secret you saved and creates the config.json file on the fly
+      run: |
+        echo '${{ secrets.SCANNER_CONFIG }}' > config.json
+
+    - name: Run Scanner
+      run: python main.py
+
+    - name: Upload Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: scan-results
+        path: bodhi_test_results.csv
